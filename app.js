@@ -19,7 +19,7 @@ const app = express();
 // Middlewares
 const allowedOrigins = [
   process.env.CLIENT_URL,
-  "https://indiannews-tawny.vercel.app",
+  "https://indiannnews.vercel.app/",
   "http://localhost:5173",
   "http://localhost:3000",
 ].filter(Boolean);
