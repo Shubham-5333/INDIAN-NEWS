@@ -17,10 +17,22 @@ const errorHandler = require('./middleware/errorHandler');
 const app = express();
 
 // Middlewares
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "https://indiannews-tawny.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:3000",
+].filter(Boolean);
+
 app.use(cors({
-  origin: [
-    "https://indiannews-tawny.vercel.app","http://localhost:5173"
-  ],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl) or matching allowed list / vercel domains
+    if (!origin || allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, true);
+    }
+  },
   credentials: true
 }));
 app.use(express.json({ limit: '20mb' }));
