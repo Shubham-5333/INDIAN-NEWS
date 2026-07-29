@@ -11,7 +11,7 @@ const uploadMedia = async (req, res) => {
     }
 
     const host = req.get('host');
-    const protocol = req.protocol;
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
     const fileUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
 
     const media = new Media({
