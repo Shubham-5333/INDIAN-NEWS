@@ -11,7 +11,7 @@ const upload = require('../middleware/uploadMiddleware');
 router.route('/')
   .get(protectAdmin, getMedia);
 
-router.post('/upload', protectAdmin, upload.single('file'), uploadMedia);
+router.post('/upload', protectAdmin, upload.any(), uploadMedia);
 
 router.route('/:id')
   .delete(protectAdmin, deleteMedia);

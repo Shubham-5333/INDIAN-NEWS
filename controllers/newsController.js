@@ -19,13 +19,13 @@ const getNews = async (req, res) => {
     const query = {};
 
     // If not admin query requesting all, filter by published status only
-    if (status) {
+    if (status && status !== 'All' && status !== 'undefined') {
       query.status = status;
     } else if (!req.query.adminView) {
       query.status = 'published';
     }
 
-    if (category && category !== 'All') {
+    if (category && category !== 'All' && category !== 'undefined') {
       query.category = { $regex: new RegExp(`^${category}$`, 'i') };
     }
 
@@ -129,12 +129,19 @@ const createNews = async (req, res) => {
       ? content.split('\n').filter((p) => p.trim())
       : [content];
 
+    let computedFeaturedImage = featuredImage || '';
+    if (req.file) {
+      computedFeaturedImage = `/images/${req.file.filename}`;
+    } else if (req.files && req.files.length > 0) {
+      computedFeaturedImage = `/images/${req.files[0].filename}`;
+    }
+
     const news = new News({
       title,
       slug,
       summary,
       content: formattedContent,
-      featuredImage: featuredImage || '',
+      featuredImage: computedFeaturedImage,
       imageCaption: imageCaption || '',
       gallery: gallery || [],
       category: category || 'General',
@@ -165,6 +172,14 @@ const updateNews = async (req, res) => {
 
     if (!news) {
       return res.status(404).json({ message: 'News article not found' });
+    }
+
+    if (req.file) {
+      news.featuredImage = `/images/${req.file.filename}`;
+    } else if (req.files && req.files.length > 0) {
+      news.featuredImage = `/images/${req.files[0].filename}`;
+    } else if (req.body.featuredImage !== undefined) {
+      news.featuredImage = req.body.featuredImage;
     }
 
     if (req.body.title && req.body.title !== news.title) {

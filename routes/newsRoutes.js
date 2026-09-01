@@ -11,15 +11,17 @@ const {
 } = require('../controllers/newsController');
 const { protectAdmin } = require('../middleware/authMiddleware');
 
+const upload = require('../middleware/uploadMiddleware');
+
 router.route('/')
   .get(getNews)
-  .post(protectAdmin, createNews);
+  .post(protectAdmin, upload.single('featuredImage'), createNews);
 
 router.route('/:slug')
   .get(getNewsBySlug);
 
 router.route('/:id')
-  .put(protectAdmin, updateNews)
+  .put(protectAdmin, upload.single('featuredImage'), updateNews)
   .delete(protectAdmin, deleteNews);
 
 router.patch('/:id/status', protectAdmin, toggleNewsStatus);

@@ -5,27 +5,41 @@ const Media = require('../models/Media');
 // @desc Upload file & save media record
 // @route POST /api/media/upload
 const uploadMedia = async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: 'No file uploaded' });
-    }
+  const uploadedFiles = req.files || (req.file ? [req.file] : []);
 
-    const host = req.get('host');
-    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-    const fileUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
+  if (!uploadedFiles || uploadedFiles.length === 0) {
+    return res.status(400).json({
+      message: 'Please upload a picture',
+    });
+  }
+
+  try {
+    const uploadImg = uploadedFiles.map((file) => `/images/${file.filename}`);
+    const primaryUrl = uploadImg[0];
 
     const media = new Media({
-      filename: req.file.filename,
-      originalName: req.file.originalname,
-      url: fileUrl,
-      mimeType: req.file.mimetype,
-      size: req.file.size,
+      filename: uploadedFiles[0].filename,
+      originalName: uploadedFiles[0].originalname,
+      url: primaryUrl,
+      images: uploadImg,
+      mimeType: uploadedFiles[0].mimetype,
+      size: uploadedFiles[0].size,
     });
 
     const savedMedia = await media.save();
-    res.status(201).json(savedMedia);
+
+    res.status(201).json({
+      url: primaryUrl,
+      images: uploadImg,
+      data: savedMedia,
+      productData: savedMedia,
+      message: 'uploaded image',
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({
+      message: error.message,
+    });
   }
 };
 
