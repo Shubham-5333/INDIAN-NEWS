@@ -22,6 +22,10 @@ const mediaSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    publicId: {
+      type: String,
+      default: '',
+    },
   },
   {
     timestamps: true,

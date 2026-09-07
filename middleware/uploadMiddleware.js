@@ -1,31 +1,18 @@
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 
-const imagesDir = path.join(__dirname, '../Assets/images');
-if (!fs.existsSync(imagesDir)) {
-  fs.mkdirSync(imagesDir, { recursive: true });
-}
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, imagesDir);
-  },
-  filename: (req, file, cb) => {
-    const extension = path.extname(file.originalname);
-    cb(null, `${file.fieldname}-${Date.now()}${extension}`);
-  },
-});
+// Use memoryStorage so images are not saved to local disk, only streamed to Cloudinary
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
-  const filetypes = /jpeg|jpg|png|gif|webp|svg/;
+  const filetypes = /jpeg|jpg|png|gif|webp|svg|avif/;
   const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
   const mimetype = filetypes.test(file.mimetype);
 
   if (extname && mimetype) {
     return cb(null, true);
   } else {
-    cb(new Error('Only images (jpg, png, gif, webp, svg) are allowed!'));
+    cb(new Error('Only images (jpg, png, gif, webp, svg, avif) are allowed!'));
   }
 };
 

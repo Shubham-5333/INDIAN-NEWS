@@ -1,4 +1,5 @@
 const News = require('../models/News');
+const { uploadToCloudinary } = require('../config/cloudinary');
 
 const slugify = (text) => {
   return text
@@ -116,7 +117,7 @@ const createNews = async (req, res) => {
     }
 
     let slug = req.body.slug ? slugify(req.body.slug) : slugify(title);
-    
+
     // Check if slug exists
     const slugExists = await News.findOne({ slug });
     if (slugExists) {
@@ -126,14 +127,16 @@ const createNews = async (req, res) => {
     const formattedContent = Array.isArray(content)
       ? content
       : typeof content === 'string' && content.includes('\n')
-      ? content.split('\n').filter((p) => p.trim())
-      : [content];
+        ? content.split('\n').filter((p) => p.trim())
+        : [content];
 
     let computedFeaturedImage = featuredImage || '';
-    if (req.file) {
-      computedFeaturedImage = `/images/${req.file.filename}`;
-    } else if (req.files && req.files.length > 0) {
-      computedFeaturedImage = `/images/${req.files[0].filename}`;
+    const fileToUpload = req.file || (req.files && req.files.length > 0 ? req.files[0] : null);
+    if (fileToUpload) {
+      const uploadResult = await uploadToCloudinary(fileToUpload.buffer, {
+        original_filename: fileToUpload.originalname,
+      });
+      computedFeaturedImage = uploadResult.secure_url;
     }
 
     const news = new News({
@@ -174,10 +177,12 @@ const updateNews = async (req, res) => {
       return res.status(404).json({ message: 'News article not found' });
     }
 
-    if (req.file) {
-      news.featuredImage = `/images/${req.file.filename}`;
-    } else if (req.files && req.files.length > 0) {
-      news.featuredImage = `/images/${req.files[0].filename}`;
+    const fileToUpload = req.file || (req.files && req.files.length > 0 ? req.files[0] : null);
+    if (fileToUpload) {
+      const uploadResult = await uploadToCloudinary(fileToUpload.buffer, {
+        original_filename: fileToUpload.originalname,
+      });
+      news.featuredImage = uploadResult.secure_url;
     } else if (req.body.featuredImage !== undefined) {
       news.featuredImage = req.body.featuredImage;
     }
@@ -195,8 +200,8 @@ const updateNews = async (req, res) => {
       news.content = Array.isArray(req.body.content)
         ? req.body.content
         : typeof req.body.content === 'string' && req.body.content.includes('\n')
-        ? req.body.content.split('\n').filter((p) => p.trim())
-        : [req.body.content];
+          ? req.body.content.split('\n').filter((p) => p.trim())
+          : [req.body.content];
     }
     if (req.body.featuredImage !== undefined) news.featuredImage = req.body.featuredImage;
     if (req.body.imageCaption !== undefined) news.imageCaption = req.body.imageCaption;
@@ -206,8 +211,8 @@ const updateNews = async (req, res) => {
       news.tags = Array.isArray(req.body.tags)
         ? req.body.tags
         : typeof req.body.tags === 'string'
-        ? req.body.tags.split(',').map((t) => t.trim())
-        : [];
+          ? req.body.tags.split(',').map((t) => t.trim())
+          : [];
     }
     if (req.body.status) news.status = req.body.status;
     if (req.body.featured !== undefined) news.featured = Boolean(req.body.featured);
