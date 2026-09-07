@@ -1,16 +1,6 @@
 const News = require('../models/News');
 const { uploadToCloudinary } = require('../config/cloudinary');
 
-const slugify = (text) => {
-  return text
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w\-]+/g, '')
-    .replace(/\-\-+/g, '-');
-};
-
 // @desc Get all news (with filtering, search, pagination)
 // @route GET /api/news
 const getNews = async (req, res) => {
@@ -64,15 +54,18 @@ const getNews = async (req, res) => {
   }
 };
 
-// @desc Get single news by slug or ID
-// @route GET /api/news/:slug
-const getNewsBySlug = async (req, res) => {
+// @desc Get single news by ID (or legacy slug)
+// @route GET /api/news/:id
+const getNewsById = async (req, res) => {
   try {
-    const { slug } = req.params;
+    const { id } = req.params;
 
-    let article = await News.findOne({ slug });
-    if (!article && slug.match(/^[0-9a-fA-F]{24}$/)) {
-      article = await News.findById(slug);
+    let article = null;
+    if (id && id.match(/^[0-9a-fA-F]{24}$/)) {
+      article = await News.findById(id);
+    }
+    if (!article) {
+      article = await News.findOne({ slug: id });
     }
 
     if (!article) {
@@ -116,14 +109,6 @@ const createNews = async (req, res) => {
       return res.status(400).json({ message: 'Title, summary, and content are required' });
     }
 
-    let slug = req.body.slug ? slugify(req.body.slug) : slugify(title);
-
-    // Check if slug exists
-    const slugExists = await News.findOne({ slug });
-    if (slugExists) {
-      slug = `${slug}-${Date.now()}`;
-    }
-
     const formattedContent = Array.isArray(content)
       ? content
       : typeof content === 'string' && content.includes('\n')
@@ -141,7 +126,6 @@ const createNews = async (req, res) => {
 
     const news = new News({
       title,
-      slug,
       summary,
       content: formattedContent,
       featuredImage: computedFeaturedImage,
@@ -187,14 +171,7 @@ const updateNews = async (req, res) => {
       news.featuredImage = req.body.featuredImage;
     }
 
-    if (req.body.title && req.body.title !== news.title) {
-      news.title = req.body.title;
-      if (!req.body.slug) {
-        news.slug = slugify(req.body.title);
-      }
-    }
-
-    if (req.body.slug) news.slug = slugify(req.body.slug);
+    if (req.body.title) news.title = req.body.title;
     if (req.body.summary) news.summary = req.body.summary;
     if (req.body.content) {
       news.content = Array.isArray(req.body.content)
@@ -241,38 +218,37 @@ const deleteNews = async (req, res) => {
     }
 
     await news.deleteOne();
-    res.json({ message: 'News article removed successfully' });
+    res.json({ message: 'News article deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// @desc Toggle publish/unpublish status
+// @desc Toggle published/draft status
 // @route PATCH /api/news/:id/status
 const toggleNewsStatus = async (req, res) => {
   try {
     const news = await News.findById(req.params.id);
+
     if (!news) {
       return res.status(404).json({ message: 'News article not found' });
     }
 
     news.status = news.status === 'published' ? 'draft' : 'published';
-    if (news.status === 'published' && !news.publishedAt) {
-      news.publishedAt = Date.now();
-    }
     await news.save();
 
-    res.json({ message: `Status updated to ${news.status}`, news });
+    res.json({ message: `Article status changed to ${news.status}`, news });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// @desc Toggle featured flag
+// @desc Toggle featured status
 // @route PATCH /api/news/:id/featured
 const toggleNewsFeatured = async (req, res) => {
   try {
     const news = await News.findById(req.params.id);
+
     if (!news) {
       return res.status(404).json({ message: 'News article not found' });
     }
@@ -288,7 +264,8 @@ const toggleNewsFeatured = async (req, res) => {
 
 module.exports = {
   getNews,
-  getNewsBySlug,
+  getNewsById,
+  getNewsBySlug: getNewsById,
   createNews,
   updateNews,
   deleteNews,

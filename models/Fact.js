@@ -28,10 +28,6 @@ const factSchema = new mongoose.Schema(
       type: String,
       default: 'Indian News Research Desk',
     },
-    slug: {
-      type: String,
-      default: '',
-    },
     seoTitle: {
       type: String,
       default: '',

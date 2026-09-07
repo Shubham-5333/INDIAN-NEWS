@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
   getNews,
-  getNewsBySlug,
+  getNewsById,
   createNews,
   updateNews,
   deleteNews,
@@ -17,10 +17,8 @@ router.route('/')
   .get(getNews)
   .post(protectAdmin, upload.single('featuredImage'), createNews);
 
-router.route('/:slug')
-  .get(getNewsBySlug);
-
 router.route('/:id')
+  .get(getNewsById)
   .put(protectAdmin, upload.single('featuredImage'), updateNews)
   .delete(protectAdmin, deleteNews);
 

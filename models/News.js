@@ -7,13 +7,6 @@ const newsSchema = new mongoose.Schema(
       required: [true, 'News title is required'],
       trim: true,
     },
-    slug: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
-    },
     summary: {
       type: String,
       required: [true, 'Summary is required'],

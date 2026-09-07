@@ -1,15 +1,5 @@
 const Category = require('../models/Category');
 
-const slugify = (text) => {
-  return text
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/[^\w\-]+/g, '')
-    .replace(/\-\-+/g, '-');
-};
-
 // @desc Get all categories
 // @route GET /api/categories
 const getCategories = async (req, res) => {
@@ -31,16 +21,13 @@ const createCategory = async (req, res) => {
       return res.status(400).json({ message: 'Category name is required' });
     }
 
-    const slug = req.body.slug ? slugify(req.body.slug) : slugify(name);
-
-    const exists = await Category.findOne({ $or: [{ name }, { slug }] });
+    const exists = await Category.findOne({ name });
     if (exists) {
-      return res.status(400).json({ message: 'Category name or slug already exists' });
+      return res.status(400).json({ message: 'Category name already exists' });
     }
 
     const category = new Category({
       name,
-      slug,
       description: description || '',
       image: image || '',
     });
@@ -63,12 +50,12 @@ const updateCategory = async (req, res) => {
     }
 
     if (req.body.name) {
-      category.name = req.body.name;
-      if (!req.body.slug) {
-        category.slug = slugify(req.body.name);
+      const exists = await Category.findOne({ name: req.body.name, _id: { $ne: category._id } });
+      if (exists) {
+        return res.status(400).json({ message: 'Category name already exists' });
       }
+      category.name = req.body.name;
     }
-    if (req.body.slug) category.slug = slugify(req.body.slug);
     if (req.body.description !== undefined) category.description = req.body.description;
     if (req.body.image !== undefined) category.image = req.body.image;
 

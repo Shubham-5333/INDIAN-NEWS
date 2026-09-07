@@ -32,7 +32,7 @@ const getFacts = async (req, res) => {
 // @route POST /api/facts
 const createFact = async (req, res) => {
   try {
-    const { title, slug, content, category, featured, status, source, seoTitle, seoDescription } = req.body;
+    const { title, content, category, featured, status, source, seoTitle, seoDescription } = req.body;
 
     if (!title || !content) {
       return res.status(400).json({ message: 'Title and content are required' });
@@ -40,7 +40,6 @@ const createFact = async (req, res) => {
 
     const fact = new Fact({
       title,
-      slug: slug || title.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^\w\-]+/g, ''),
       content,
       category: category || 'General',
       featured: Boolean(featured),
@@ -68,7 +67,6 @@ const updateFact = async (req, res) => {
     }
 
     if (req.body.title) fact.title = req.body.title;
-    if (req.body.slug !== undefined) fact.slug = req.body.slug;
     if (req.body.content) fact.content = req.body.content;
     if (req.body.category) fact.category = req.body.category;
     if (req.body.featured !== undefined) fact.featured = Boolean(req.body.featured);
