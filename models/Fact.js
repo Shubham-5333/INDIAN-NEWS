@@ -26,7 +26,7 @@ const factSchema = new mongoose.Schema(
     },
     source: {
       type: String,
-      default: 'Indian News Research Desk',
+      default: 'Breaking Hours Research Desk',
     },
     seoTitle: {
       type: String,

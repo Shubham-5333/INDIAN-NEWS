@@ -44,7 +44,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Health Check API
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', server: 'Indian News Express Backend', timestamp: new Date() });
+  res.json({ status: 'ok', server: 'Breaking Hours Express Backend', timestamp: new Date() });
 });
 
 // API Routes

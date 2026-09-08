@@ -4,7 +4,7 @@ const settingSchema = new mongoose.Schema(
   {
     websiteName: {
       type: String,
-      default: 'INDIAN NEWS',
+      default: 'BREAKING HOURS',
     },
     logo: {
       type: String,
@@ -16,11 +16,11 @@ const settingSchema = new mongoose.Schema(
     },
     footerText: {
       type: String,
-      default: '© 2026 INDIAN NEWS Platform. All rights reserved. Breaking news, unbiased reports and in-depth analysis from across India.',
+      default: '© 2026 BREAKING HOURS Platform. All rights reserved. Breaking news, unbiased reports and in-depth analysis from across India.',
     },
     contactEmail: {
       type: String,
-      default: 'contact@indiannews.com',
+      default: 'contact@breakinghours.com',
     },
     contactPhone: {
       type: String,

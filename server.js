@@ -12,7 +12,7 @@ const startServer = async () => {
 
     app.listen(PORT, () => {
       console.log(`==================================================`);
-      console.log(`🚀 Indian News Express Server running on Port ${PORT}`);
+      console.log(`🚀 Breaking Hours Express Server running on Port ${PORT}`);
       console.log(`🌐 Public API: http://localhost:${PORT}/api/news`);
       console.log(`🔐 Admin Auth: http://localhost:${PORT}/api/auth/login`);
       console.log(`==================================================`);

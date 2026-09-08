@@ -1,7 +1,7 @@
 {
   "name": "indian-news-backend",
   "version": "1.0.0",
-  "description": "Backend API and Admin services for Indian News platform",
+  "description": "Backend API and Admin services for Breaking Hours platform",
   "main": "server.js",
   "type": "commonjs",
   "scripts": {

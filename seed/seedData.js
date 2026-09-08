@@ -54,9 +54,9 @@ const seedInitialData = async () => {
     if (settingCount === 0) {
       console.log('Seeding initial site settings...');
       await Setting.create({
-        websiteName: 'INDIAN NEWS',
-        footerText: '© 2026 INDIAN NEWS Platform. All rights reserved. Delivering independent, reliable news and facts.',
-        contactEmail: 'editor@indiannews.com',
+        websiteName: 'BREAKING HOURS',
+        footerText: '© 2026 BREAKING HOURS Platform. All rights reserved. Delivering independent, reliable news and facts.',
+        contactEmail: 'editor@breakinghours.com',
         contactPhone: '+91 11 4567 8900',
         address: 'Media Complex, New Delhi, 110001',
       });

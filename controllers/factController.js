@@ -44,7 +44,7 @@ const createFact = async (req, res) => {
       category: category || 'General',
       featured: Boolean(featured),
       status: status || 'published',
-      source: source || 'Indian News Research Desk',
+      source: source || 'Breaking Hours Research Desk',
       seoTitle: seoTitle || title,
       seoDescription: seoDescription || content.substring(0, 160),
     });
